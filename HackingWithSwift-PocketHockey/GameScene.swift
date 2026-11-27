@@ -7,6 +7,14 @@
 
 import SpriteKit
 
+/// Creates static constraints to define bitmask values of different physics categories used in SpriteKit's physics system.
+enum PhysicsCategory {
+    static let puck: UInt32 = 1
+    static let wall: UInt32 = 2
+    static let paddle: UInt32 = 4
+    static let goal: UInt32 = 8
+}
+
 class GameScene: SKScene {
     let neonMagenta = SKColor(red: 1, green: 0.2, blue: 0.9, alpha: 1)
     
