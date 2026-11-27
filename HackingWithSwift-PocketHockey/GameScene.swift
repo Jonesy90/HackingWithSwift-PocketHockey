@@ -67,6 +67,7 @@ class GameScene: SKScene {
         
         body.categoryBitMask = PhysicsCategory.paddle
         body.collisionBitMask = PhysicsCategory.wall
+        paddle.physicsBody = body
         
         world.addChild(paddle) // The fully constructed 'paddle' node (including the 'paddleHandle' node) is added to the 'world' node as a child.
         
