@@ -54,8 +54,19 @@ class GameScene: SKScene {
         paddleHandle.fillColor = color.withAlphaComponent(0.5) // Fills the colour of the paddle to the parameter that was passed in with a slight opacity/transparency look.
         paddleHandle.strokeColor = color // Fills the outline of the node with the color passed in.
         paddleHandle.glowWidth = 3
-        
         paddle.addChild(paddleHandle) // The 'paddleHandle' node is added to the 'paddle' node as a child.
+        
+        /// Physics configuration for the paddle body.
+        let body = SKPhysicsBody(circleOfRadius: paddleRadius)
+        body.friction = 0 // The body has no friction so it will not slow down as it moves along the rink walls.
+        body.restitution = 0.9 // The bounciness of the body. The higher the number the more bouncy it is.
+        body.linearDamping = 8 // The paddle eventually glide to a stop natuarally when the user lifts their finger from the screen.
+        body.density = 10 // The paddle is heavier than the puck.
+        body.allowsRotation = false // The paddle will never rotate.
+        body.usesPreciseCollisionDetection = true
+        
+        body.categoryBitMask = PhysicsCategory.paddle
+        body.collisionBitMask = PhysicsCategory.wall
         
         world.addChild(paddle) // The fully constructed 'paddle' node (including the 'paddleHandle' node) is added to the 'world' node as a child.
         
