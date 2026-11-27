@@ -10,36 +10,26 @@ import SpriteKit
 import GameplayKit
 
 class GameViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    
+    // When we've layed our the SubViews (when the UIViewController knows it's size). The game scene will be made at the same size.
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
         
-        if let view = self.view as! SKView? {
-            // Load the SKScene from 'GameScene.sks'
-            if let scene = SKScene(fileNamed: "GameScene") {
-                // Set the scale mode to scale to fit the window
-                scene.scaleMode = .aspectFill
-                
-                // Present the scene
-                view.presentScene(scene)
-            }
-            
-            view.ignoresSiblingOrder = true
-            
-            view.showsFPS = true
-            view.showsNodeCount = true
-        }
+        /// Get the view and check it's an SKView, then make sure the scene of the skView is nil. Otherwise bail out.
+        guard let skView = view as? SKView, skView.scene == nil else { return }
+        
+        skView.presentScene(GameScene.init(size: skView.bounds.size))
     }
-
+    
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            return .allButUpsideDown
-        } else {
-            return .all
-        }
+        .portrait
     }
-
+    
     override var prefersStatusBarHidden: Bool {
-        return true
+        true
+    }
+    
+    override var prefersHomeIndicatorAutoHidden: Bool {
+        true
     }
 }
