@@ -59,7 +59,7 @@ class GameScene: SKScene {
     var rinkFrame = CGRect.zero
     
     var player: SKShapeNode!
-    var pick: SKShapeNode!
+    var puck: SKShapeNode!
     var world = SKNode()
     
     let playerSpeed = 2_500.0
@@ -165,6 +165,17 @@ class GameScene: SKScene {
         let velocity = CGVector(dx: (targetX - paddle.position.x) * 12, dy: (targetY - paddle.position.y) * 12)
         /// Limits the speed of the paddles velocity to the maximum speed applied.
         paddle.physicsBody?.velocity = velocity.limited(to: maxSpeed)
+    }
+    
+    /// Repositions and launches the puck at the start of play (or after a goal), sending it towards a given direction.
+    /// - Parameter direction: <#direction description#>
+    func serve(toward direction: Double) {
+        puck.position = CGPoint(x: rinkFrame.midX, y: rinkFrame.midY) // Sets the pucks location to the middle of the screen.
+        puck.isHidden = false // Makes the puck visable, in case it was hidden after a previous event.
+        puck.setScale(0.1) // Starts the puck at a very small scale.
+        puck.run(.scale(to: 1, duration: 0.2)) // Returns the punk back to it's original size after a certain amount of time.
+        puck.physicsBody?.isDynamic = true // Guarantees the puck will move and interact physics (collision, forces etc).
+        puck.physicsBody?.velocity = CGVector(dx: .random(in: -150...150), dy: direction * 300) // Sets the puck to move in a certain direction.
     }
     
     override func update(_ currentTime: TimeInterval) {
