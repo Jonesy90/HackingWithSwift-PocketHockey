@@ -87,6 +87,7 @@ class GameScene: SKScene {
     ///   - y: y position of the paddle in the rinkFrame.
     /// - Returns: A paddle of type SKShapeNode
     func makePaddle(color: SKColor, y: Double) -> SKShapeNode {
+        /// Desgining how the paddle looks.
         let paddle = SKShapeNode(circleOfRadius: paddleRadius) // Creates a new SKShapeNode in a shape of a circle with the radius of 'paddleRadius' (32.0).
         paddle.position = CGPoint(x: rinkFrame.midX, y: y) // Positions the node in the middle of the middle of the rinkFrame (x axis) and the y position is the parameter that's passed in.
         paddle.fillColor = color.withAlphaComponent(0.2) // Fills the colour of the paddle to the parameter that was passed in with a slight opacity/transparency look.
@@ -116,6 +117,36 @@ class GameScene: SKScene {
         world.addChild(paddle) // The fully constructed 'paddle' node (including the 'paddleHandle' node) is added to the 'world' node as a child.
         
         return paddle // Returns the fully constructed 'paddle' node to be used as a property later.
+    }
+    
+    /// Creates, configures and returns a SKShapeNode that represents the puck. It's responsible for the pucks visual appearance and the physics-based behaviour.
+    /// - Returns: Returns the puck node as SKShapeNode
+    func makePuck() -> SKShapeNode {
+        /// Designing how the puck looks.
+        let puck = SKShapeNode(circleOfRadius: puckRadius)
+        puck.fillColor = neonCyan.withAlphaComponent(0.35)
+        puck.strokeColor = neonCyan
+        puck.lineWidth = 2
+        puck.glowWidth = 8
+        
+        /// Configures the phyics behaviour of the puck node.
+        let body = SKPhysicsBody(circleOfRadius: puckRadius)
+        body.friction = 0
+        body.restitution = 0.95
+        body.linearDamping = 0.25
+        body.allowsRotation = false
+        body.usesPreciseCollisionDetection = true
+        
+        /// Configures the collision categories of the puck node.
+        body.categoryBitMask = PhysicsCategory.puck // Identifies the body of the node as a puck for physics checks.
+        body.collisionBitMask = PhysicsCategory.wall | PhysicsCategory.paddle // Other body nodes the puck node can collide with (and bounce off).
+        body.contactTestBitMask = PhysicsCategory.wall | PhysicsCategory.paddle | PhysicsCategory.goal // Notifies when the puck node collides with any of these other body nodes.
+        
+        /// Applies the physics body to the puck node and adds it to the world node.
+        puck.physicsBody = body
+        world.addChild(puck)
+        
+        return puck
     }
     
     /// Used to move the paddle (SKShapeNode) toward a target position (CGPoint). It clamps the paddle so it stays within the rink bountries, calculates the velocity and limits the paddle speed.
