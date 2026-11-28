@@ -79,6 +79,9 @@ class GameScene: SKScene {
         /// In this case, the world node contains the 'paddle' and 'paddleHandle' nodes.
         addChild(world)
         player = makePaddle(color: neonMagenta, y: rinkFrame.minY + 120) // Creates a paddle node as assigns it to the player variable.
+        puck = makePuck() // Creates the puck node.
+        
+        serve(toward: -1) // Serves the puck node and pushes the node in the direction of the player (down).
     }
     
     /// Creates a circular paddle node
@@ -187,6 +190,9 @@ class GameScene: SKScene {
                 maxSpeed: playerSpeed
             )
         }
+        /// Gets the pucks velocity and limits the speed it can go.
+        guard let puckBody = puck.physicsBody else { return }
+        puckBody.velocity = puckBody.velocity.limited(to: maxPuckSpeed)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
