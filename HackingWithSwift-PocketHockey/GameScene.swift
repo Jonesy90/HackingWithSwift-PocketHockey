@@ -15,6 +15,40 @@ enum PhysicsCategory {
     static let goal: UInt32 = 8
 }
 
+/// Objective: A way to keep numbers inside a particular range.
+/// Solution: An extension to CGFloat that will check if the number falls below or above some range. Returning to the nearest boundary if it does or the original number if it doesn't.
+extension CGFloat {
+    func clamped(to range: ClosedRange<Double>) -> Double {
+        if self < range.lowerBound {
+            range.lowerBound
+        } else if self > range.upperBound {
+            range.upperBound
+        } else {
+            self
+        }
+    }
+}
+
+// CGVector: Is used with SpriteKit and Core Graphics to represent a vector in 2D space (dx = horizontal, dy = vertical).
+/// Calculates the vectors speed and provides a vector speed cap (limit) to keep the vector movement under control.
+extension CGVector {
+    /// A computed property to determine the speed of the node using pythagorean theorem.
+    /// This gives the distance from the origin to the point, which also referred to as the speed of the vector.
+    var speed: Double {
+        hypot(dx, dy)
+    }
+    
+    /// Ensures the speed vector does not exceed the maximum speed.
+    func limited(to maxSpeed: Double) -> CGVector {
+        guard speed > maxSpeed else { return self }
+        
+        /// If the speed does exceed the maximum speed, a scaling factor value is created and applied.
+        /// This will update the vector so it matches the maximum speed instead of exceeding it.
+        let scale = maxSpeed / speed
+        return CGVector(dx: dx * scale, dy: dy * scale)
+    }
+}
+
 class GameScene: SKScene {
     let neonMagenta = SKColor(red: 1, green: 0.2, blue: 0.9, alpha: 1)
     
@@ -23,6 +57,9 @@ class GameScene: SKScene {
     
     var player: SKShapeNode!
     var world = SKNode()
+    
+    let playerSpeed = 2500.0
+    var playerTarget: CGPoint?
     
     /// This is called when the GameScene is first presented by the SpritKit view (SKView).
     /// It is the starting point for setting up the scenes initial state.
@@ -72,6 +109,51 @@ class GameScene: SKScene {
         world.addChild(paddle) // The fully constructed 'paddle' node (including the 'paddleHandle' node) is added to the 'world' node as a child.
         
         return paddle // Returns the fully constructed 'paddle' node to be used as a property later.
+    }
+    
+    /// Used to move the paddle (SKShapeNode) toward a target position (CGPoint). It clamps the paddle so it stays within the rink bountries, calculates the velocity and limits the paddle speed.
+    /// - Parameters:
+    ///   - paddle: The SKShapeNode representing the paddle to move.
+    ///   - target: The CGPoint to where the SKShapNode is going to move to.
+    ///   - yRange: The allowed vertical range (y-coordinates) for the paddle.
+    ///   - maxSpeed: The maximum speed the paddle node is allowed to move.
+    func drive(_ paddle: SKShapeNode, toward target: CGPoint, yRange: ClosedRange<Double>, maxSpeed: Double) {
+        /// The paddle is clamped inbetween the left and right side of the rink.
+        let targetX = target.x.clamped(to: (rinkFrame.minX + paddleRadius)...(rinkFrame.maxX - paddleRadius))
+        /// The paddle is clamped between the the bottom and top of the rink.
+        let targetY = target.y.clamped(to: yRange)
+        
+        /// Calculates the paddles velocity by calculating the difference between the targetX and targetY.
+        let velocity = CGVector(dx: (targetX - paddle.position.x) * 12, dy: (targetY - paddle.position.y) * 12)
+        /// Limits the speed of the paddles velocity to the maximum speed applied.
+        paddle.physicsBody?.velocity = velocity.limited(to: maxSpeed)
+    }
+    
+    override func update(_ currentTime: TimeInterval) {
+        if let playerTarget {
+            drive(
+                player,
+                toward: playerTarget,
+                yRange: (rinkFrame.minY + paddleRadius)...(rinkFrame.midY - paddleRadius),
+                maxSpeed: playerSpeed
+            )
+        }
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        playerTarget = touches.first?.location(in: self)
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        playerTarget = touches.first?.location(in: self)
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        playerTarget = nil
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        playerTarget = nil
     }
     
 }
