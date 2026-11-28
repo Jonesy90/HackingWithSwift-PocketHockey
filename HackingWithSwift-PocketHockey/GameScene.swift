@@ -51,15 +51,22 @@ extension CGVector {
 
 class GameScene: SKScene {
     let neonMagenta = SKColor(red: 1, green: 0.2, blue: 0.9, alpha: 1)
+    let neonCyan = SKColor(red: 0.2, green: 0.9, blue: 1, alpha: 1)
     
     let paddleRadius = 32.0
+    let puckRadius = 16.0
+    
     var rinkFrame = CGRect.zero
     
     var player: SKShapeNode!
+    var pick: SKShapeNode!
     var world = SKNode()
     
-    let playerSpeed = 2500.0
+    let playerSpeed = 2_500.0
+    let maxPuckSpeed = 1_500.0
+    
     var playerTarget: CGPoint?
+    
     
     /// This is called when the GameScene is first presented by the SpritKit view (SKView).
     /// It is the starting point for setting up the scenes initial state.
